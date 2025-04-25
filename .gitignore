@@ -1,0 +1,6 @@
+infomail.pdf
+original-infomail.html
+cleaned-infomail.html
+infomail-*.pdf
+sed_script.sed
+config.yaml
