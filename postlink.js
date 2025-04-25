@@ -71,7 +71,6 @@ async function uploadToPingen(pdfPath, config) {
     const uploadRes = await axios.get('https://api.pingen.com/file-upload', {
         headers: { Authorization: `Bearer ${token}` }
     });
-    console.log("🔎 uploadRes.data:", JSON.stringify(uploadRes.data, null, 2));
     const {
         url: uploadUrl,
         url_signature: fileUrlSignature
@@ -109,7 +108,7 @@ async function uploadToPingen(pdfPath, config) {
         }
     );
 
-console.log(`✅ Brief bei Pingen angelegt: ${response.data.data.id}`);
+console.log(`created pingen.com mail object: ${response.data.data.id}`);
 }
 
 const config = yaml.parse(fs.readFileSync('config.yaml', 'utf8'));
