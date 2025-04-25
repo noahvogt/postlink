@@ -1,4 +1,7 @@
 # Postlink
+fully automate printing and sending an email as physical post
+
+## Background
 In our church we send each week a so-called ***infomail***, an email with current events, information and news. But circa a dozen older poeple can't access emails, so therefore we print a dozen *infomails*, and give them some people before each sunday service and some we send via the physical post.
 
 This is quite tedious, so this project was made to automate the whole workflow. This equates to half an hour time saved each week.
