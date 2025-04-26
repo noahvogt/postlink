@@ -11,20 +11,22 @@ There is a seperate email address, where the *infomail* gets sent to. the postli
 
 The pdf then ist uploaded via a customizable command to a church computer, that uses it's own script to automatically print out the desired number of *infomails*.
 
-Also, the pdf is customized with cover letters and uploaded to the (pingen.com api)[https://pingen.com], which is a service that prints the letters out and and sends them out via the physical post.
+Also, the pdf is customized with cover letters and uploaded to the [pingen.com api](https://pingen.com), which is a service that prints the letters out and and sends them out via the physical post.
 
 Now the only things we need to do is keep the server on which the postlink script runs running and ensuring the pingen.com account has enough credit.
 
 ## Installation
 On a Unix-like server install
- - (and enable) a cronjob daemon like (cronie)[https://github.com/cronie-crond/cronie] [optional but recommended for periodic runs]
+ - (and enable) a cronjob daemon like [cronie](https://github.com/cronie-crond/cronie) [optional but recommended for periodic runs]
  - a recent version of [nodejs](https://nodejs.org/en/download)
 
 Clone this repo and cd into it:
+
     git clone https://github.com/noahvogt/postlink.js
     cd postlink
 
 Then, install the dependencies:
+
     npm install puppeteer imap-simple yaml jsdom quoted-printable pdf-merger-js pdf-lib axios
 
 Apply your custom config in `config.yaml`. This example config serves enough of an explanation. If not, consult the source code.
@@ -86,11 +88,15 @@ generate:
 ```
 
 Run via
+
     node postlink.js
 
-For periodic runs we recommend, as mentioned above, cronjobs.
+For periodic runs we recommend, as mentioned above, cronjobs. For example, to run the script every day @ 23:30 I use:
 
-For testing purposes, you can run with the option `--dry-run` to not upload the *infomail* the the curch computer and not send api requests to pingen.com.
+    30 23 * * * (cd /home/postlink/postlink/; /home/postlink/.nvm/versions/node/v22.15.0/bin/node /home/postlink/postlink/postlink.js | logger -t postlink; echo "postlink exit code: $?" | logger -t postlink)
+
+For testing purposes, you can run with the option `--dry-run` to not upload the *infomail* the the church computer and not send api requests to pingen.com.
+
     node postlink.js --dry-run
 
 ## Licensing
