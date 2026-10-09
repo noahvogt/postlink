@@ -91,9 +91,14 @@ Run via
 
     node postlink.js
 
-For periodic runs we recommend, as mentioned above, cronjobs. For example, to run the script every day @ 23:30 I use:
+For periodic runs we recommend, as mentioned above, cronjobs. For example, to run the script every 10 minutes I use:
 
-    30 23 * * * (cd /home/postlink/postlink/; /home/postlink/.nvm/versions/node/v22.15.0/bin/node /home/postlink/postlink/postlink.js | logger -t postlink; echo "postlink exit code: $?" | logger -t postlink)
+    */10 * * * * cd /home/postlink/postlink && { flock -n -o /tmp/postlink.lock timeout -k 30s 9m /home/postlink/.nvm/versions/node/v22.15.0/bin/node postlink.js; echo "postlink exit code: $?"; } 2>&1 | logger -t postlink
+
+The wrapper commands guard against runs that hang, e.g. on a stalled IMAP connection, which would otherwise pile up and eat memory:
+ - `flock -n -o /tmp/postlink.lock` only allows one run at a time; a new run exits immediately while the previous one still holds the lock. `-o` keeps child processes like the puppeteer browser from holding on to the lock.
+ - `timeout -k 30s 9m` stops a run after 9 minutes (before the next cron run), and kills it 30 seconds later if it does not exit. The limit is generous on purpose: the email gets marked as read before the pdf is generated and uploaded, so a run that is cut off at that stage would skip that *infomail*.
+ - `{ ...; echo "postlink exit code: $?"; } 2>&1 | logger -t postlink` sends both output and errors to the system log, and logs the exit code of the script itself (`124` on a timeout) instead of the one of `logger`. Read the log with `journalctl -t postlink`.
 
 For testing purposes, you can run with the option `--dry-run` to not upload the *infomail* the the church computer and not send api requests to pingen.com.
 
