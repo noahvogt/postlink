@@ -213,6 +213,7 @@ const imapConfig = {
     } else {
         execSync(config.upload.cmd, { shell: '/bin/bash' });
 
+	/*
         const mergerTasks = config.cover_letters || [];
 
         // add cover letters to the general pdf file
@@ -229,5 +230,6 @@ const imapConfig = {
 
             await uploadToPingen(outputFile, config);
         }
+	*/
     }
 })();
