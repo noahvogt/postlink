@@ -128,10 +128,9 @@ const imapConfig = {
     const connection = await imaps.connect(imapConfig);
     await connection.openBox('INBOX');
 
-    const searchCriteria = ['ALL'];
-    const fetchOptions = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)', 'TEXT'], struct: true };
-
-    const messages = await connection.search(searchCriteria, fetchOptions);
+    // only fetch the flags of all emails, as downloading every body on each
+    // run takes minutes and lots of memory once the inbox has grown
+    const messages = await connection.search(['ALL'], { bodies: [] });
 
     if (messages.length === 0) {
         console.log('No emails found. Exiting...');
@@ -139,14 +138,17 @@ const imapConfig = {
         return;
     }
 
-    const latest = messages[messages.length - 1];
-    const isSeen = latest.attributes.flags.includes('\\Seen');
+    const { uid: latestUid, flags } = messages[messages.length - 1].attributes;
+    const isSeen = flags.includes('\\Seen');
 
     if (isSeen) {
         console.log('Last email in inbox already marked as read. Exiting...');
         await connection.end();
         return;
     }
+
+    const fetchOptions = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)', 'TEXT'], struct: true };
+    const [latest] = await connection.search([['UID', latestUid]], fetchOptions);
 
     const qp = require('quoted-printable');
     const { JSDOM } = require('jsdom');
